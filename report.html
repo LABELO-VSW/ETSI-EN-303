@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modelo de Relatório</title>
+    <link rel="license" href="//creativecommons.org/licenses/by-sa/3.0/" />
+    <link rel="source" href="https://en.wikipedia.org/wiki/Typesetting" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="css/interface.css" />
+    <link rel="stylesheet" type="text/css" href="css/report-style.css" />
+
+    <!-- Scripts -->
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/pagedjs/dist/paged.polyfill.js"></script>
+    <script src="./index.js"></script>
+    <script>
+        let json;
+        class Handler extends Paged.Handler {
+            constructor(chunker, polisher, caller) {
+                super(chunker, polisher, caller);
+            }
+            beforeParsed(content) {
+                return updateContent(content)
+            }
+            afterRendered() {
+                document.querySelectorAll('tr').forEach(e => {
+                    e.style.lineHeight = 1
+                })
+            }
+        }
+        Paged.registerHandlers(Handler);
+    </script>
+</head>
+
+<body>
+    <div id="pt-br" class="report-model">
+        <header class="header" id="header">
+            <div class="header-first-row">
+                <img src="./assets/logoPuc.png" width="40pt" />
+                <span class="main-headline">
+                    Pontifícia Universidade Católica do Rio Grande do Sul<br>LABELO - Laboratórios Especializados em
+                    Eletroeletrônica <br> Calibração e Ensaios<br>Rede Brasileira de Laboratórios de Ensaios
+                </span>
+                <img src="./assets/LogoLABELO.png" width="120pt">
+            </div>
+            <div class="header-second-row">
+                <h1>Relatório de Ensaio</h1>
+                <h1 id="report-number"></h1>
+            </div>
+            <div class="header-third-row">
+                <small id='dates'></small>
+            </div>
+        </header>
+        <div id="content" class="mw-body" role="main">
+            <h1>Requerente:</h1>
+            <p>
+                <d-value>requerente.nome</d-value><br>
+                <d-value>requerente.endereço</d-value>
+            </p>
+            <h1>Objeto ensaiado (amostra):</h1>
+            <table class="border-none">
+                <tr>
+                    <td><b>Protocolo: <d-value>amostra.protocolo</d-value></b></td>
+                    <td><b>Orçamento: <d-value>orçamento</d-value></b></td>
+                </tr>
+                <tr>
+                    <td>Nome: <d-value>amostra.nome</d-value>
+                    </td>
+                    <td>Fabricante: <d-value>amostra.fabricante</d-value>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Modelo: <d-value>amostra.modelo</d-value>
+                    </td>
+                    <td>Número de série: <d-value>amostra.numero_serie</d-value>
+                    </td>
+                </tr>
+            </table>
+            <h1>Documentação que acompanha a amostra:</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>SHA-256</th>
+                    </tr>
+                </thead>
+                <tbody jshtml="docs.map(e=>`<tr><td>${e.name}</td><td>${e.hash}</td></tr>`).join('')">
+                </tbody>
+            </table>
+            <div class="page-break"></div>
+            <!--Larsen - O mestre começa a codar-->
+
+            <h1>Registro de Ensaio:</h1>
+            <table style="table-layout: auto;">
+                <thead>
+                    <tr>
+                        <th>Requisito</th>
+                        <th>Descrição</th>
+                        <th>Resultado</th>
+                    </tr>
+                </thead>
+                <tbody jshtml="resultados.map(e=>
+                `<tr>
+                    <td style='width: 100px; text-align: center'>
+                        <div>${e.item}</div>
+                    </td>
+                    <td style='width: 1fr'>
+                        <div>${e.label}</div>
+                    </td>
+                    <td style='width: 100px; text-align: center'>
+                        <div>${e.resultado}</div>
+                    </td>
+                </tr>`
+            ).join('')">
+                </tbody>
+            </table>
+
+            <!--Larsen - O mestre termina de codar-->
+            <div class=final-obs>
+                <h1>Observações Finais</h1>
+                <ul>
+                    <li>Os resultados de ensaios contidos neste relatório somente devem ser utilizados para atender
+                        utilizado para outro propósito.</li>
+                    <li>O fornecimento da amostra pelo cliente isenta o LABELO-PUCRS de responsabilidade quanto à sua
+                        representatividade em relação a lotes de fabricação e comercialização.</li>
+                    <li>O presente relatório de ensaio é válido exclusivamente para a amostra ensaiada, nas condições em que
+                        foram realizados os ensaios e não sendo extensivo a quaisquer lotes, mesmo que similares.</li>
+                    <li>A partir do momento em que a amostra é retirada do laboratório, esgota-se a possibilidade de
+                        contestação dos resultados ou mesmo de repetição dos ensaios, já que o LABELO-PUCRS deixa de ser
+                        responsável pela sua manutenção.</li>
+                    <li>É vedada a reprodução do presente relatório de ensaio, no todo ou em parte, sem prévia autorização
+                        do LABELO-PUCRS originada por solicitação formal do contratante.</li>
+                    <li>Os ensaios foram realizados nas instalações do LABELO-PUCRS.</li>
+                    <li>Todos os ensaios foram realizados de forma sequencial sem intervenção do requerente.</li>
+                </ul>
+                <div class=signature>
+                    <div class=signature-line></div><small>
+                        <d-value>signatario.nome</d-value>
+                    </small>
+                </div>
+            </div>
+        </div>
+        <footer class="footer" id="footer">
+            <small>Av.Ipiranga nº 6681, Prédio 30 Bloco A, Sala 210 – Partenon – CEP 90619-900 – Porto Alegre-RS –
+                Brasil<br> Telefone: (51) 3320 3551 – Fax: (51) 3320 3883 – labelo @pucrs.br – www.labelo.com.br</small>
+        </footer>
+    </div>
+    <div id="en-us" class="report-model">
+        <header class="header" id="header">
+            <div class="header-first-row">
+                <img src="./assets/logoPuc.png" width="40pt" />
+                <span class="main-headline">
+                    Pontifícia Universidade Católica do Rio Grande do Sul<br>LABELO - Laboratórios Especializados em
+                    Eletroeletrônica <br> Calibração e Ensaios<br>Rede Brasileira de Laboratórios de Ensaios
+                </span>
+                <img src="./assets/LogoLABELO.png" width="120pt">
+            </div>
+            <div class="header-second-row">
+                <h1>Test Report</h1>
+                <h1 id="report-number"></h1>
+            </div>
+            <div class="header-third-row">
+                <small id='dates'></small>
+            </div>
+        </header>
+        <div id="content" class="mw-body" role="main">
+            <h1>Applicant:</h1>
+            <p>
+                <d-value>requerente.nome</d-value><br>
+                <d-value>requerente.endereço</d-value>
+            </p>
+            <h1>Object tested (sample):</h1>
+            <table class="border-none">
+                <tr>
+                    <td><b>Protocol: <d-value>amostra.protocolo</d-value></b></td>
+                    <td><b>Budget: <d-value>orçamento</d-value></b></td>
+                </tr>
+                <tr>
+                    <td>Name: <d-value>amostra.nome</d-value>
+                    </td>
+                    <td>Manufacturer: <d-value>amostra.fabricante</d-value>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Model: <d-value>amostra.modelo</d-value>
+                    </td>
+                    <td>Serial number: <d-value>amostra.numero_serie</d-value>
+                    </td>
+                </tr>
+            </table>
+            <h1>Documentation accompanying the sample:</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>SHA-256</th>
+                    </tr>
+                </thead>
+                <tbody jshtml="docs.map(e=>`<tr><td>${e.name}</td><td>${e.hash}</td></tr>`).join('')">
+                </tbody>
+            </table>
+            <div class="page-break"></div>
+            <!--Larsen - O mestre começa a codar-->
+
+            <h1>Test Record:</h1>
+            <table style="table-layout: auto;">
+                <thead>
+                    <tr>
+                        <th>Provision</th>
+                        <th>Description</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody jshtml="resultados.map(e=>
+                `<tr>
+                    <td style='width: 100px; text-align: center'>
+                        <div>${e.item}</div>
+                    </td>
+                    <td style='width: 1fr'>
+                        <div>${e.label}</div>
+                    </td>
+                    <td style='width: 80px; text-align: center'>
+                        <div>${e.resultado}</div>
+                    </td>
+                </tr>`
+            ).join('')">
+                </tbody>
+            </table>
+
+            <!--Larsen - O mestre termina de codar-->
+            <div class=final-obs>
+                <h1>Closing Remarks</h1>
+                <ul>
+                    <li>The test results contained in this report should only be used to meet used for another purpose.</li>
+                    <li>The supply of the sample by the customer exempts LABELO-PUCRS from liability as to its representativeness in relation to manufacturing and commercialization batches.</li>
+                    <li>This test report is valid exclusively for the sample tested, under the conditions in which the tests were carried out and is not extended to any batch, even if similar.</li>
+                    <li>From the moment the sample is removed from the laboratory, the possibility of contesting the results or even repeating the tests is exhausted, since LABELO-PUCRS is no longer responsible for its maintenance.</li>
+                    <li>It is forbidden to reproduce this test report, in whole or in part, without prior authorization from LABELO-PUCRS, originated by the formal request of the contracting party.</li>
+                    <li>The tests were carried out at the facilities of LABELO-PUCRS.</li>
+                    <li>All tests were performed sequentially without the intervention of the applicant.</li>
+                </ul>
+                <div class=signature>
+                    <div class=signature-line></div><small>
+                        <d-value>signatario.nome</d-value>
+                    </small>
+                </div>
+            </div>
+        </div>
+        <footer class="footer" id="footer">
+            <small>Av.Ipiranga nº 6681, Building 30 Block A, Room 210 – Partenon – Zip code 90619-900 – Porto Alegre-RS –
+                Brazil<br> Phone: (51) 3320 3551 – Fax: (51) 3320 3883 – labelo @pucrs.br – www.labelo.com.br</small>
+        </footer>
+    </div>
+    </div>
+</body>
+
+</html>
